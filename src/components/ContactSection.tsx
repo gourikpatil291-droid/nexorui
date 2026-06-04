@@ -45,7 +45,7 @@ export default function ContactSection() {
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full glass-panel border-warm-beige/10 mb-4 w-fit">
               <Sparkles className="w-3.5 h-3.5 text-luxury-gold" />
               <span className="text-[10px] font-display font-bold uppercase tracking-widest text-warm-beige/85">
-                Start a Project
+                Get In Touch
               </span>
             </div>
             

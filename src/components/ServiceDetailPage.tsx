@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ArrowLeft, Sparkles } from "lucide-react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import HolographicGlobe from "./HolographicGlobe";
 
 interface AccordionItem {
   title: string;
@@ -27,7 +28,8 @@ export default function ServiceDetailPage({
   approachDescription,
   accordionItems,
 }: ServiceDetailPageProps) {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
+  // Start with all accordions closed
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const toggleAccordion = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
@@ -42,9 +44,13 @@ export default function ServiceDetailPage({
       <div className="absolute top-[25%] right-[5%] w-[300px] h-[300px] rounded-full bg-luxury-gold/5 blur-[120px] pointer-events-none" />
 
       {/* Sub-page Hero Section */}
-      <section className="relative pt-36 pb-20 md:pt-44 md:pb-28 border-b border-warm-beige/5">
+      <section className="relative pt-36 pb-20 md:pt-44 md:pb-28 border-b border-warm-beige/5 overflow-hidden">
+        {/* Giant Holographic Globe perfectly centered in the right empty space */}
+        <div className="absolute top-[50%] -translate-y-1/2 -right-32 md:-right-10 lg:right-0 opacity-100 pointer-events-none z-0 hidden md:block scale-100 lg:scale-110">
+          <HolographicGlobe />
+        </div>
+
         <div className="max-w-7xl mx-auto px-6 relative z-10">
-          
           {/* Breadcrumbs */}
           <div className="flex items-center space-x-3 mb-8">
             <Link 
@@ -60,22 +66,20 @@ export default function ServiceDetailPage({
             </span>
           </div>
 
-          {/* Heading */}
+          {/* Heading (Removed text-gradient-beige to fix invisible child spans with opacity) */}
           <motion.h1 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-4xl md:text-6xl lg:text-7xl font-display font-extrabold text-gradient-beige leading-[1.1] max-w-4xl"
+            className="text-4xl md:text-6xl lg:text-7xl font-display font-extrabold text-warm-beige leading-[1.1] max-w-4xl"
           >
             {title}
           </motion.h1>
         </div>
-      </section>
-
-      {/* Content Grid */}
-      <section className="relative py-20 md:py-28">
+      </section>      {/* Content Grid */}
+      <section className="relative py-20 md:py-28 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-start relative">
             
             {/* Left Column: Our Approach */}
             <motion.div 
@@ -161,16 +165,16 @@ export default function ServiceDetailPage({
           </h2>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/#contact"
+              href="/portfolio"
               className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 rounded-full font-display font-bold uppercase tracking-widest text-xs bg-warm-beige text-maroon-black hover:bg-transparent hover:text-warm-beige border border-warm-beige transition-all duration-300 interactive-hover"
             >
-              Start a Project
+              See Projects
             </Link>
             <Link
-              href="/services"
+              href="/contact"
               className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 rounded-full font-display font-bold uppercase tracking-widest text-xs glass-panel border border-warm-beige/10 hover:border-warm-beige/35 text-warm-beige hover:bg-warm-beige/5 transition-all duration-300 interactive-hover"
             >
-              All Services
+              Get In Touch
             </Link>
           </div>
         </div>

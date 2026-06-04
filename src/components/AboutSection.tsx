@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import * as THREE from "three";
-import { ShieldCheck, Zap, Users } from "lucide-react";
+import { Users } from "lucide-react";
 
 // Reusable animated counter component
 function Counter({ value, duration = 2.5 }: { value: number; duration?: number }) {
@@ -65,21 +65,39 @@ export default function AboutSection() {
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-    // Metallic Torus Knot Geometry
-    const geometry = new THREE.TorusKnotGeometry(1.6, 0.5, 120, 16);
+    // Metallic Box Geometry
+    const innerGeom = new THREE.BoxGeometry(2.0, 2.0, 2.0);
     
     // High-end reflective physical material
-    const material = new THREE.MeshPhysicalMaterial({
+    const innerMat = new THREE.MeshPhysicalMaterial({
       color: 0x7B1822, // Rich Maroon
-      metalness: 0.95,
-      roughness: 0.15,
+      metalness: 0.9,
+      roughness: 0.2,
       clearcoat: 1.0,
       clearcoatRoughness: 0.1,
       flatShading: true, // Faceted look to capture light beautifully
     });
 
-    const mesh = new THREE.Mesh(geometry, material);
-    scene.add(mesh);
+    const innerMesh = new THREE.Mesh(innerGeom, innerMat);
+
+    // Gold wireframe outer cube
+    const wireGeom = new THREE.BoxGeometry(2.3, 2.3, 2.3);
+    const wireMat = new THREE.MeshBasicMaterial({
+      color: 0xC5A880, // Gold
+      wireframe: true,
+      transparent: true,
+      opacity: 0.4,
+    });
+    
+    const wireMesh = new THREE.Mesh(wireGeom, wireMat);
+
+    const cubeGroup = new THREE.Group();
+    cubeGroup.add(innerMesh);
+    cubeGroup.add(wireMesh);
+    scene.add(cubeGroup);
+
+    // Re-use mesh name for compatibility with animation code
+    const mesh = cubeGroup;
 
     // Lights
     const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
@@ -153,8 +171,10 @@ export default function AboutSection() {
       cancelAnimationFrame(animationFrameId);
       resizeObserver.disconnect();
       renderer.dispose();
-      geometry.dispose();
-      material.dispose();
+      innerGeom.dispose();
+      innerMat.dispose();
+      wireGeom.dispose();
+      wireMat.dispose();
     };
   }, []);
 
@@ -175,33 +195,14 @@ export default function AboutSection() {
               Behind The Scenes
             </span>
             <h2 className="text-3xl md:text-5xl font-display font-bold text-gradient-beige mb-6 leading-tight">
-              We Craft Digital Interfaces and Autonomous Systems
+              <span className="font-light italic text-warm-beige/70">Your Trusted Source For </span><br />Software Development
             </h2>
-            <p className="text-sm md:text-base font-sans text-warm-beige/60 mb-8 leading-relaxed">
-              Nexoresha is a futuristic design and development studio. We build intelligent platforms that help next-generation businesses grow at lightspeed. We value structural speed, hyper-polished layouts, and custom interactive code.
+            <p className="text-sm md:text-base font-sans text-warm-beige/65 mb-6 leading-relaxed">
+              We are a software development company dedicated to transforming ideas into scalable, secure, and high-impact digital solutions. Our team of experienced developers, designers, and problem-solvers delivers end-to-end software services — from requirement analysis and UI/UX design to development, deployment, and long-term maintenance. We focus on building reliable, user-friendly products that simplify business processes, improve efficiency, and create meaningful digital experiences.
             </p>
-
-            {/* Core Values */}
-            <div className="space-y-6 mb-12">
-              <div className="flex items-start space-x-4">
-                <div className="p-2 bg-maroon/20 border border-warm-beige/10 rounded-lg text-luxury-gold mt-1">
-                  <ShieldCheck className="w-4 h-4" />
-                </div>
-                <div>
-                  <h4 className="text-sm md:text-base font-display font-semibold text-warm-beige">Security & Compliance Standards</h4>
-                  <p className="text-xs md:text-sm font-sans text-warm-beige/45">Fully compliant and secure data flow protocols across custom models.</p>
-                </div>
-              </div>
-              <div className="flex items-start space-x-4">
-                <div className="p-2 bg-maroon/20 border border-warm-beige/10 rounded-lg text-luxury-gold mt-1">
-                  <Zap className="w-4 h-4" />
-                </div>
-                <div>
-                  <h4 className="text-sm md:text-base font-display font-semibold text-warm-beige">Sub-millisecond Speed</h4>
-                  <p className="text-xs md:text-sm font-sans text-warm-beige/45">Every platform is optimized for peak performance and layout responses.</p>
-                </div>
-              </div>
-            </div>
+            <p className="text-sm md:text-base font-sans text-warm-beige/65 mb-8 leading-relaxed">
+              With expertise across modern technology stacks, we develop high-performance web and mobile applications, cloud-based platforms, and enterprise systems tailored to your business needs. Whether you are a startup building your first product or an enterprise upgrading legacy systems, we work as your technology partner to drive digital transformation, ensure scalability, and support sustainable growth through future-ready solutions.
+            </p>
 
             {/* Stats Row */}
             <div className="grid grid-cols-3 gap-4 pt-8 border-t border-warm-beige/10">

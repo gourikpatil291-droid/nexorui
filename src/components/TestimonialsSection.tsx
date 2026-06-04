@@ -15,24 +15,52 @@ interface Testimonial {
 export default function TestimonialsSection() {
   const testimonials: Testimonial[] = [
     {
-      quote: "Nexoresha completely reimagined our digital product ecosystem. The Three.js interactive visual modules and sub-millisecond AI queries they deployed blew our investors away. A world-class agency.",
-      name: "Marcus Vance",
-      role: "CEO",
-      company: "Aether AI",
-      image: "/img5.jpeg",
-    },
-    {
-      quote: "Their clean engineering standard is unmatched. They migrated our entire server infrastructure to a fully automated node network with zero downtime. Fast, aesthetic, and completely dependable.",
-      name: "Elena Rostova",
-      role: "Founder",
-      company: "Helios Cloud",
+      quote: "Outstanding service and great technical expertise. The team delivered our project on time with excellent quality and continuous support. Highly recommended for any software development needs.",
+      name: "Deepak Shah",
+      role: "Professional Partner",
+      company: "Linkedin",
       image: "/img1.jpeg",
     },
     {
-      quote: "Working with Nexoresha felt like a partnership from 2030. They have a rare ability to combine high-performance code architecture with cinematic design visual aesthetics.",
-      name: "Devon Lane",
-      role: "VP of Product",
-      company: "Synapse Labs",
+      quote: "I had the pleasure of working with this creative agency, and I must say, they truly impressed me. They consistently think outside the box, resulting in impressive and impactful work. I highly recommend this agency for their consistent delivery of exceptional creative solutions.",
+      name: "Bharat Sharma",
+      role: "Collaborator",
+      company: "Contra",
+      image: "/img2.jpeg",
+    },
+    {
+      quote: "This creative agency stands out with their exceptional talent and expertise. Their ability to think outside the box and bring unique ideas to life is truly impressive. With meticulous attention to detail, they consistently deliver visually stunning and impactful work.",
+      name: "Darshan Jain",
+      role: "Client Partner",
+      company: "Contra",
+      image: "/img3.jpeg",
+    },
+    {
+      quote: "I had the pleasure of working with this creative agency, and I must say, they truly impressed me. They consistently think outside the box, resulting in impressive and impactful work. I highly recommend this agency for their consistent delivery of exceptional creative solutions.",
+      name: "Emanuel Rodriguez",
+      role: "Independent Client",
+      company: "Contra",
+      image: "/img4.jpeg",
+    },
+    {
+      quote: "This creative agency stands out with their exceptional talent and expertise. Their ability to think outside the box and bring unique ideas to life is truly impressive. With meticulous attention to detail, they consistently deliver visually stunning and impactful work.",
+      name: "Samiksha More",
+      role: "Product Owner",
+      company: "Contra",
+      image: "/img5.jpeg",
+    },
+    {
+      quote: "I had the pleasure of working with this creative agency, and I must say, they truly impressed me. They consistently think outside the box, resulting in impressive and impactful work. I highly recommend this agency for their consistent delivery of exceptional creative solutions.",
+      name: "Ramesh Das",
+      role: "Creative Partner",
+      company: "Contra",
+      image: "/img1.jpeg",
+    },
+    {
+      quote: "This creative agency stands out with their exceptional talent and expertise. Their ability to think outside the box and bring unique ideas to life is truly impressive. With meticulous attention to detail, they consistently deliver visually stunning and impactful work.",
+      name: "Trisha Singh",
+      role: "Design Lead",
+      company: "Contra",
       image: "/img2.jpeg",
     },
   ];
@@ -62,8 +90,8 @@ export default function TestimonialsSection() {
               Client Feedback
             </span>
           </div>
-          <h2 className="text-3xl md:text-5xl font-display font-bold text-gradient-beige mb-6">
-            Trusted by Next-Gen Leaders
+          <h2 className="text-3xl md:text-5xl font-display font-bold text-gradient-beige mb-6 leading-tight">
+            Customer <span className="font-light italic text-warm-beige/70">Voices:</span> <br className="md:hidden" /> Hear What <span className="font-light italic text-warm-beige/70">They Say!</span>
           </h2>
         </div>
 

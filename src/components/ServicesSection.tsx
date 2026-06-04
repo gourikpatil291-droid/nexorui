@@ -14,60 +14,62 @@ interface ServiceItem {
   route: string;
 }
 
+import HolographicGlobe from "./HolographicGlobe";
+
 export default function ServicesSection() {
   const services: ServiceItem[] = [
     {
-      title: "Website Design & Development",
-      description: "Build ultra-fast web systems and immersive interactive interfaces using React, Next.js, and modern architectural frameworks designed to scale.",
+      title: "Website Design and Development",
+      description: "We build fast, secure, and scalable web applications tailored to your business needs, ensuring smooth performance and great user experience.",
       icon: Globe,
       glowColor: "rgba(197, 168, 128, 0.1)",
       route: "/services/web-design",
     },
     {
       title: "High Performance Mobile Apps",
-      description: "Deliver high-fidelity native iOS and Android experiences featuring butter-smooth animations, caching, and offline support.",
+      description: "Custom Android and iOS apps designed for performance, usability, and growth, helping you engage users anytime, anywhere.",
       icon: Smartphone,
       glowColor: "rgba(230, 213, 195, 0.1)",
       route: "/services/mobile-apps",
     },
     {
-      title: "DevOps Automation & Deployment",
-      description: "Automate server setups, secure continuous pipelines, and scale hosting nodes with AWS, Docker, Kubernetes, and optimized serverless builds.",
+      title: "DevOps Automation and Deployment",
+      description: "We reduce downtime and speed up delivery with automated infrastructure and deployment workflows. Helping your business scale with confidence and reliability.",
       icon: Cpu,
       glowColor: "rgba(74, 52, 40, 0.15)",
       route: "/services/devops",
     },
     {
-      title: "Reliable Maintenance & Support",
-      description: "Keep your application healthy, secure, and updated with round-the-clock monitoring, fast bug fixes, and continuous performance tuning.",
+      title: "Reliable Maintenance and Support",
+      description: "Ongoing monitoring, updates, and optimization to keep your systems secure, stable, and running at peak performance.",
       icon: Wrench,
       glowColor: "rgba(197, 168, 128, 0.1)",
       route: "/services/maintenance",
     },
     {
-      title: "Technical Training",
-      description: "Practical, real-world technical training programs designed to prepare students and teams for enterprise-level software engineering.",
+      title: "Industry Oriented Technical Training",
+      description: "We provide practical, real-world training based on current industry tools, technologies, and workflows. Our programs prepare students and professionals to be job-ready from day one.",
       icon: GraduationCap,
       glowColor: "rgba(230, 213, 195, 0.1)",
       route: "/services/training",
     },
     {
       title: "Digital Marketing Services",
-      description: "Scale your user growth and market dominance with optimized search marketing, premium copy, and visual campaign templates.",
+      description: "We create data-driven marketing plans to increase brand visibility and reach the right audience. Focused on delivering measurable growth and long-term results.",
       icon: Megaphone,
       glowColor: "rgba(74, 52, 40, 0.15)",
       route: "/services/digital-marketing",
     },
     {
       title: "Search Engine Optimization",
-      description: "Grow organic traffic at scale with structured keyword mapping, lightning-fast technical SEO audits, and premium backlink strategies.",
+      description: "We optimize your website to rank higher on search engines and attract organic traffic. Improving visibility, credibility, and conversion rates over time.",
       icon: Search,
       glowColor: "rgba(197, 168, 128, 0.1)",
       route: "/services/seo",
     },
     {
       title: "Analytics & Performance Tracking",
-      description: "Unlock deep tracking dashboards, real-time analytics data pipelines, custom conversion goals, and user behavior maps.",
+      description: "We track, analyze, and optimize campaigns using real-time data insights. Ensuring continuous improvement and better marketing decisions.",
       icon: BarChart3,
       glowColor: "rgba(230, 213, 195, 0.1)",
       route: "/services/analytics",
@@ -99,23 +101,36 @@ export default function ServicesSection() {
     <section id="services" className="relative w-full py-24 md:py-32 bg-maroon-black overflow-hidden">
       {/* Decorative soft glowing backdrop sphere */}
       <div className="absolute top-[30%] left-[50%] -translate-x-1/2 w-[500px] h-[500px] rounded-full bg-maroon/5 blur-[120px] pointer-events-none" />
-
       <div className="relative z-10 max-w-7xl mx-auto px-6">
         
         {/* Section Header */}
         <div className="flex flex-col items-center text-center mb-16 md:mb-24">
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full glass-panel border-warm-beige/10 mb-4">
+          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full glass-panel border-warm-beige/10 mb-6">
             <Sparkles className="w-3.5 h-3.5 text-luxury-gold" />
             <span className="text-[10px] font-display font-bold uppercase tracking-widest text-warm-beige/85">
               Our Capabilities
             </span>
           </div>
-          <h2 className="text-3xl md:text-5xl font-display font-bold text-gradient-beige mb-6 max-w-2xl">
-            Futuristic Services for Next-Gen Brands
-          </h2>
-          <p className="text-sm md:text-base font-sans text-warm-beige/50 max-w-lg">
-            We operate at the intersection of high-fidelity code and cinematic brand design to deploy scalable systems.
-          </p>
+          
+          <div className="flex flex-col items-center justify-center max-w-4xl mb-4 relative w-full">
+            {/* Holographic Globe positioned to the right of the text */}
+            <div className="absolute -right-32 md:-right-48 lg:-right-64 top-1/2 -translate-y-1/2 opacity-75 pointer-events-none z-0 scale-50 md:scale-75">
+              <HolographicGlobe />
+            </div>
+
+            <div className="flex items-center justify-center gap-3 mb-2 flex-wrap relative z-10">
+              <div className="w-12 h-6 md:w-16 md:h-8 rounded-full overflow-hidden border border-warm-beige/25 relative flex-shrink-0 shadow-[0_0_15px_rgba(230,213,195,0.15)]">
+                <img src="/img/photo/2.png" alt="Team" className="w-full h-full object-cover" />
+              </div>
+              <h2 className="text-3xl md:text-5xl font-display font-bold text-gradient-beige tracking-tight leading-tight drop-shadow-lg">
+                Technology <span className="font-light italic text-warm-beige/70">powering</span>
+              </h2>
+            </div>
+            <h2 className="text-3xl md:text-5xl font-display font-bold tracking-tight leading-tight relative z-10 drop-shadow-lg">
+              <span className="font-light italic text-warm-beige/70">your </span>
+              <span className="text-gradient-beige">Business Success</span>
+            </h2>
+          </div>
         </div>
 
         {/* Services Grid */}

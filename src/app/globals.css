@@ -1,18 +1,18 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0A0203;
-  --foreground: #F4EFE6;
+  --background: #F4EFE6;
+  --foreground: #5A121A;
 }
 
 @theme {
-  /* Premium Dark Luxury Theme Configuration */
-  --color-warm-beige: #F4EFE6;       /* Primary text & light fills */
-  --color-maroon: #7B1822;           /* Accent color: rich maroon */
-  --color-dark-maroon: #5A121A;      /* Secondary dark maroon */
-  --color-maroon-black: #0A0203;     /* Main background color: deep dark maroon-black */
-  --color-deep-gray: #160607;        /* Card backgrounds: dark maroon-gray */
-  --color-soft-ivory: #FFF;          /* Link hovers: bright white */
+  /* Premium Light Luxury Theme Configuration (Reversed Maroon/Beige) */
+  --color-warm-beige: #5A121A;       /* Primary text & dark fills: now rich dark maroon */
+  --color-maroon: #F4EFE6;           /* Accent color: now warm beige */
+  --color-dark-maroon: #EAE0D0;      /* Secondary dark: now cream-beige */
+  --color-maroon-black: #F4EFE6;     /* Main background color: now warm beige */
+  --color-deep-gray: #FFFDF9;        /* Card backgrounds: now ultra-light ivory */
+  --color-soft-ivory: #3A080C;       /* Link hovers: extra dark maroon */
   --color-luxury-gold: #C5A880;      /* Highlights: gold */
 
   --font-sans: var(--font-jakarta), system-ui, sans-serif;
@@ -41,18 +41,18 @@
   }
 }
 
-/* Custom global styles for the dark luxury theme */
+/* Custom global styles for the reversed luxury theme */
 html {
   scroll-behavior: smooth;
-  background-color: #0A0203;
-  color: #E5D3B3;
+  background-color: #F4EFE6;
+  color: #5A121A;
   overflow-x: hidden;
 }
 
 body {
   font-family: var(--font-jakarta), system-ui, sans-serif;
-  background-color: #0A0203;
-  color: #E5D3B3;
+  background-color: #F4EFE6;
+  color: #5A121A;
   cursor: none; /* Hide default cursor to use custom magnetic cursor */
 }
 
@@ -63,64 +63,59 @@ a, button, input, textarea, [role="button"] {
 
 /* Selection colors */
 ::selection {
-  background-color: #7B1822;
-  color: #0A0203;
+  background-color: #5A121A;
+  color: #F4EFE6;
 }
 
 /* Custom light scrollbars */
 ::gradient-vignette {
-  background: radial-gradient(circle, transparent 60%, rgba(42, 9, 13, 0.05) 100%);
+  background: radial-gradient(circle, transparent 60%, rgba(90, 18, 26, 0.05) 100%);
 }
 
+/* Hide scrollbar entirely for a cleaner luxury aesthetic */
 ::-webkit-scrollbar {
-  width: 8px;
+  display: none;
 }
-::-webkit-scrollbar-track {
-  background: #0A0203;
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(197, 168, 128, 0.25); /* Gold scrollbar thumb */
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(197, 168, 128, 0.45);
+html, body {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 
-/* Glassmorphism utility classes for dark theme */
+/* Glassmorphism utility classes for reversed theme */
 .glass-panel {
-  background: rgba(10, 2, 3, 0.75);
+  background: rgba(244, 239, 230, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(197, 168, 128, 0.12); /* Gold border */
+  border: 1px solid rgba(90, 18, 26, 0.12); /* Maroon border */
 }
 
 .glass-card {
-  background: rgba(22, 6, 7, 0.65);
+  background: rgba(255, 253, 249, 0.7);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(123, 24, 34, 0.15); /* Maroon border */
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(90, 18, 26, 0.1); /* Maroon border */
+  box-shadow: 0 8px 32px 0 rgba(90, 18, 26, 0.05);
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   transform-style: preserve-3d;
   perspective: 1000px;
 }
 
 .glass-card:hover {
-  border-color: rgba(197, 168, 128, 0.38); /* Gold border on hover */
-  background: rgba(123, 24, 34, 0.08); /* Maroon glow tint */
-  box-shadow: 0 20px 50px -10px rgba(123, 24, 34, 0.3), 0 0 30px 2px rgba(168, 85, 247, 0.12);
+  border-color: rgba(90, 18, 26, 0.35); /* Maroon border on hover */
+  background: rgba(244, 239, 230, 0.55);
+  box-shadow: 0 20px 50px -10px rgba(90, 18, 26, 0.12), 0 0 30px 2px rgba(197, 168, 128, 0.08);
   transform: translateY(-8px) scale(1.025) rotateX(2deg) rotateY(1deg); /* 3D Perspective shift */
 }
 
 .text-gradient-beige {
-  background: linear-gradient(135deg, #E5D3B3 15%, #C5A880 65%, #7B1822 100%);
+  background: linear-gradient(135deg, #7B1822 15%, #5A121A 65%, #C5A880 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .text-gradient-gold {
-  background: linear-gradient(135deg, #C5A880 0%, #E5D3B3 50%, #7B1822 100%);
+  background: linear-gradient(135deg, #C5A880 0%, #7B1822 50%, #5A121A 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -139,4 +134,83 @@ a, button, input, textarea, [role="button"] {
   opacity: 0.12;
   pointer-events: none;
   z-index: 9999;
+}
+
+/* ── OVERLAY CONTAINER ───────────────────────────────────── */
+.proj-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  pointer-events: none;
+  overflow: hidden;
+}
+.proj-overlay.is-open { pointer-events: all; }
+
+/* ── CURTAIN LAYERS ──────────────────────────────────────── */
+.proj-curtain {
+  position: absolute;
+  inset: 0;
+  transform-origin: left center;
+  transform: scaleX(0);
+  will-change: transform;
+}
+.proj-curtain--1 { background: #4a0f0f; z-index: 2; } /* maroon-deep */
+.proj-curtain--2 { background: #FAF6EE; z-index: 3; } /* beige-light */
+
+.proj-overlay.curtain-in .proj-curtain--1 {
+  animation: curtainIn 0.55s cubic-bezier(0.77,0,0.18,1) forwards;
+}
+.proj-overlay.curtain-in .proj-curtain--2 {
+  animation: curtainIn 0.55s cubic-bezier(0.77,0,0.18,1) 0.12s forwards;
+}
+.proj-overlay.curtain-reveal .proj-curtain--2 {
+  animation: curtainOut 0.6s cubic-bezier(0.77,0,0.18,1) forwards;
+}
+.proj-overlay.curtain-close .proj-curtain--2 {
+  animation: curtainIn 0.45s cubic-bezier(0.77,0,0.18,1) forwards;
+  transform-origin: right center;
+}
+.proj-overlay.curtain-close .proj-curtain--1 {
+  animation: curtainIn 0.45s cubic-bezier(0.77,0,0.18,1) 0.1s forwards;
+  transform-origin: right center;
+}
+
+@keyframes curtainIn {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+@keyframes curtainOut {
+  from { transform: scaleX(1); transform-origin: right center; }
+  to   { transform: scaleX(0); transform-origin: right center; }
+}
+
+/* Show the actual content body */
+.proj-body {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #FAF6EE;
+  opacity: 0;
+  transition: opacity 0s;
+}
+.proj-overlay.content-visible .proj-body { 
+  opacity: 1; 
+}
+
+/* Hide Google Translate top bar and original text tooltips */
+.skiptranslate iframe, 
+.goog-te-banner-frame {
+  display: none !important;
+}
+body {
+  top: 0px !important; 
+}
+#google_translate_element {
+  display: none !important;
+}
+.goog-text-highlight {
+  background: none !important;
+  box-shadow: none !important;
 }

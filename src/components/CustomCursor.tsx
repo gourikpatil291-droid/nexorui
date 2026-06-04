@@ -1,206 +1,330 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-
-interface SmokeParticle {
-  id: number;
-  x: number;
-  y: number;
-  size: number;
-  opacity: number;
-  vx: number;
-  vy: number;
-  color: string;
-  shape: "circle" | "triangle" | "square";
-  rotation: number;
-  vRotation: number;
-}
+import * as THREE from "three";
 
 export default function CustomCursor() {
-  const [isVisible, setIsVisible] = useState(false);
   const [position, setPosition] = useState({ x: -100, y: -100 });
-  const [rotation, setRotation] = useState(0);
-  const [particles, setParticles] = useState<SmokeParticle[]>([]);
-  const lastPosition = useRef({ x: -100, y: -100 });
-  const lastSpawnPosition = useRef({ x: -100, y: -100 });
-  const particleIdRef = useRef(0);
-
+  const [isVisible, setIsVisible] = useState(false);
+  const cursorRef = useRef<HTMLDivElement>(null);
+  
   useEffect(() => {
     if (typeof window === "undefined") return;
-    
-    // Hide default cursor
-    document.body.style.cursor = "none";
 
     const handleMouseMove = (e: MouseEvent) => {
-      const curX = e.clientX;
-      const curY = e.clientY;
-      setPosition({ x: curX, y: curY });
+      setPosition({ x: e.clientX, y: e.clientY });
       setIsVisible(true);
-
-      const dx = curX - lastPosition.current.x;
-      const dy = curY - lastPosition.current.y;
-      
-      let angle = rotation;
-      if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
-        // Calculate angle in degrees
-        const rad = Math.atan2(dy, dx);
-        angle = (rad * 180) / Math.PI + 90; // offset by 90 degrees since SVG points up
-        setRotation(angle);
-
-        // Spawn smoke particle if we moved past threshold
-        const distFromLastSpawn = Math.sqrt(
-          Math.pow(curX - lastSpawnPosition.current.x, 2) +
-          Math.pow(curY - lastSpawnPosition.current.y, 2)
-        );
-
-        if (distFromLastSpawn > 10) {
-          const radCar = (angle - 90) * Math.PI / 180;
-          // Calculate exhaust position at the rear of the car
-          const radExhaust = angle * Math.PI / 180;
-          const exhaustX = curX - 22 * Math.sin(radExhaust);
-          const exhaustY = curY + 22 * Math.cos(radExhaust);
-
-          const id = particleIdRef.current++;
-          const vx = -Math.cos(radCar) * 0.5 + (Math.random() - 0.5) * 0.4;
-          const vy = -Math.sin(radCar) * 0.5 + (Math.random() - 0.5) * 0.4;
-          
-          // Lavender and Beige neon color palette
-          const smokeColors = [
-            "#E6E6FA", // Soft lavender
-            "#D1B3FF", // Neon light lavender
-            "#FFECA1", // Neon beige
-            "#FDF6E2", // Soft cream beige
-          ];
-          const color = smokeColors[Math.floor(Math.random() * smokeColors.length)];
-          const shapes = ["circle", "triangle", "square"] as const;
-          const shape = shapes[Math.floor(Math.random() * shapes.length)];
-          const particleRotation = Math.random() * 360;
-          const vRotation = (Math.random() - 0.5) * 6; // spin rate
-
-          const newParticle: SmokeParticle = {
-            id,
-            x: exhaustX,
-            y: exhaustY,
-            size: 8 + Math.random() * 10,
-            opacity: 0.8,
-            vx,
-            vy,
-            color,
-            shape,
-            rotation: particleRotation,
-            vRotation,
-          };
-
-          setParticles((prev) => [...prev, newParticle].slice(-80)); // cap max active particles
-          lastSpawnPosition.current = { x: curX, y: curY };
-        }
-      }
-
-      lastPosition.current = { x: curX, y: curY };
     };
 
     window.addEventListener("mousemove", handleMouseMove);
     document.addEventListener("mouseleave", () => setIsVisible(false));
     document.addEventListener("mouseenter", () => setIsVisible(true));
+    document.body.style.cursor = "none";
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseleave", () => setIsVisible(false));
-      document.removeEventListener("mouseenter", () => setIsVisible(true));
     };
-  }, [rotation]);
-
-  // High performance particle physics update loop
-  useEffect(() => {
-    let animId: number;
-    const update = () => {
-      setParticles((prev) =>
-        prev
-          .map((p) => ({
-            ...p,
-            x: p.x + p.vx,
-            y: p.y + p.vy,
-            size: p.size + 0.2,
-            rotation: p.rotation + p.vRotation,
-            opacity: p.opacity - 0.015,
-          }))
-          .filter((p) => p.opacity > 0)
-      );
-      animId = requestAnimationFrame(update);
-    };
-    animId = requestAnimationFrame(update);
-    return () => cancelAnimationFrame(animId);
   }, []);
 
-  if (!isVisible) return null;
+  useEffect(() => {
+    if (!cursorRef.current) return;
+    
+    // Setup Toy Car variables
+    let scene: THREE.Scene | null = null;
+    let camera: THREE.PerspectiveCamera | null = null;
+    let renderer: THREE.WebGLRenderer | null = null;
+    let car3D: THREE.Group | null = null;
+    let animationId: number;
+    let targetRotationAngle = 0;
+    
+    let smokeCanvas: HTMLCanvasElement | null = null;
+    let smokeCtx: CanvasRenderingContext2D | null = null;
+    let smokeParticles: any[] = [];
+    
+    let lastCarX: number | null = null;
+    let lastCarY: number | null = null;
+    
+    let currentAngle = 0;
+    let currentTiltX = 0;
+    let currentTiltY = 0;
+    let targetTiltX = 0;
+    let targetTiltY = 0;
+    
+    let currentDrift = 0;
+    let targetDrift = 0;
+
+    const $cursor = cursorRef.current;
+
+    // 1. Create WebGL canvas container inside cursor element
+    const canvasContainer = document.createElement('div');
+    canvasContainer.className = 'mil-toy-car-canvas-container';
+    canvasContainer.style.width = '80px';
+    canvasContainer.style.height = '80px';
+    canvasContainer.style.position = 'absolute';
+    canvasContainer.style.top = '50%';
+    canvasContainer.style.left = '50%';
+    canvasContainer.style.transform = 'translate(-50%, -50%)';
+    canvasContainer.style.pointerEvents = 'none';
+    $cursor.appendChild(canvasContainer);
+
+    // 2. Setup Three.js WebGL Scene & Camera
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(38, 1, 0.1, 10);
+    camera.position.set(2.8, 2.4, 3.6);
+    camera.lookAt(0, 0.35, 0);
+
+    renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setSize(80, 80);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    canvasContainer.appendChild(renderer.domElement);
+
+    // Lights
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.55);
+    scene.add(ambientLight);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.85);
+    dirLight.position.set(6, 10, 6);
+    scene.add(dirLight);
+
+    // 3. Build Low-Poly 3D Toy Car Group
+    car3D = new THREE.Group();
+
+    const bodyMat = new THREE.MeshLambertMaterial({ color: 0x8b222b }); // Maroon Chassis
+    const roofMat = new THREE.MeshLambertMaterial({ color: 0x1A0D2A }); // Dark Roof
+    const glassMat = new THREE.MeshLambertMaterial({ color: 0x80deea, emissive: 0x00bcd4, emissiveIntensity: 0.15 }); // Windows
+    const tireMat = new THREE.MeshLambertMaterial({ color: 0x181818 }); // Tires
+    const hubcapMat = new THREE.MeshStandardMaterial({ color: 0xdddddd, roughness: 0.25, metalness: 0.7 }); // Chrome parts
+
+    // Chassis
+    const bodyMesh = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.65, 1.25), bodyMat);
+    bodyMesh.position.y = 0.35;
+    car3D.add(bodyMesh);
+
+    // Cabin
+    const cabinMesh = new THREE.Mesh(new THREE.BoxGeometry(1.15, 0.55, 1.05), roofMat);
+    cabinMesh.position.set(-0.15, 0.95, 0);
+    car3D.add(cabinMesh);
+
+    // Windows
+    const windshieldMesh = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.45, 0.95), glassMat);
+    windshieldMesh.position.set(0.42, 0.95, 0);
+    windshieldMesh.rotation.z = -0.32;
+    car3D.add(windshieldMesh);
+
+    const sideWinMesh = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.32, 1.07), glassMat);
+    sideWinMesh.position.set(-0.2, 0.95, 0);
+    car3D.add(sideWinMesh);
+
+    const rearWinMesh = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.35, 0.9), glassMat);
+    rearWinMesh.position.set(-0.74, 0.95, 0);
+    rearWinMesh.rotation.z = 0.2;
+    car3D.add(rearWinMesh);
+
+    // Front and Rear Bumpers
+    const frontBumper = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.18, 1.4), hubcapMat);
+    frontBumper.position.set(1.1, 0.22, 0);
+    car3D.add(frontBumper);
+
+    const rearBumper = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.18, 1.4), hubcapMat);
+    rearBumper.position.set(-1.1, 0.22, 0);
+    car3D.add(rearBumper);
+
+    // Headlights and Taillights
+    const headL = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 8), new THREE.MeshBasicMaterial({ color: 0xfffde7 }));
+    headL.position.set(1.05, 0.45, 0.4);
+    car3D.add(headL);
+
+    const headR = headL.clone();
+    headR.position.z = -0.4;
+    car3D.add(headR);
+
+    const tailL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.12, 0.22), new THREE.MeshBasicMaterial({ color: 0xff1744 }));
+    tailL.position.set(-1.05, 0.48, 0.42);
+    car3D.add(tailL);
+
+    const tailR = tailL.clone();
+    tailR.position.z = -0.42;
+    car3D.add(tailR);
+
+    // Wheels
+    const wheelGeom = new THREE.CylinderGeometry(0.32, 0.32, 0.22, 16);
+    wheelGeom.rotateX(Math.PI / 2);
+    const wheelsPos = [
+        { x: 0.65, z: 0.65 },  { x: 0.65, z: -0.65 },
+        { x: -0.65, z: 0.65 }, { x: -0.65, z: -0.65 }
+    ];
+    wheelsPos.forEach((pos) => {
+        const wGroup = new THREE.Group();
+        wGroup.position.set(pos.x, 0.22, pos.z);
+        wGroup.add(new THREE.Mesh(wheelGeom, tireMat));
+        
+        const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.24, 8), hubcapMat);
+        cap.geometry.rotateX(Math.PI / 2);
+        wGroup.add(cap);
+        car3D!.add(wGroup);
+    });
+
+    scene.add(car3D);
+
+    // Create Smoke Overlay Canvas
+    const canvas = document.createElement('canvas');
+    canvas.id = 'mil-smoke-canvas';
+    canvas.style.position = 'fixed';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    canvas.style.pointerEvents = 'none';
+    canvas.style.zIndex = '9998'; // Below the main cursor dot
+    document.body.appendChild(canvas);
+    smokeCanvas = canvas;
+    smokeCtx = canvas.getContext('2d');
+    
+    const resizeSmokeCanvas = () => {
+        if (smokeCanvas) {
+            smokeCanvas.width = window.innerWidth;
+            smokeCanvas.height = window.innerHeight;
+        }
+    };
+    resizeSmokeCanvas();
+    window.addEventListener('resize', resizeSmokeCanvas);
+
+    function render3DLoop() {
+        if (!renderer || !scene || !camera || !car3D || !cursorRef.current) return;
+
+        const rect = cursorRef.current.getBoundingClientRect();
+        const carX = rect.left + rect.width / 2;
+        const carY = rect.top + rect.height / 2;
+
+        if (lastCarX === null || lastCarY === null) {
+            lastCarX = carX;
+            lastCarY = carY;
+        } else {
+            const dx = carX - lastCarX;
+            const dy = carY - lastCarY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist > 0.15) {
+                targetRotationAngle = -Math.atan2(dy, dx);
+
+                targetTiltX = Math.min(Math.max(-dy * 0.045, -0.35), 0.35);
+                targetTiltY = Math.min(Math.max(dx * 0.045, -0.35), 0.35);
+
+                let turnRate = targetRotationAngle - currentAngle;
+                while (turnRate < -Math.PI) turnRate += Math.PI * 2;
+                while (turnRate > Math.PI) turnRate -= Math.PI * 2;
+
+                targetDrift = Math.min(Math.max(turnRate * 1.6, -0.55), 0.55);
+                targetTiltY += turnRate * 0.65;
+
+                if (smokeCtx) {
+                    const phi = -currentAngle;
+                    const ox = -Math.cos(phi) * 22, oy = -Math.sin(phi) * 22;
+                    const sx = Math.sin(phi) * 6, sy = -Math.cos(phi) * 6;
+
+                    if (dist > 0.5) {
+                        smokeParticles.push({
+                            x: carX + ox + sx, y: carY + oy + sy,
+                            vx: -dx * 0.12 + (Math.random() - 0.5) * 0.6,
+                            vy: -dy * 0.12 - 0.25,
+                            radius: 2, maxRadius: 12, alpha: 0.6, decay: 0.02,
+                            color: { r: 155, g: 130, b: 110 }
+                        });
+                    }
+
+                    if (Math.abs(turnRate) > 0.08 && dist > 1.2) {
+                        const rx = -Math.cos(phi) * 16, ry = -Math.sin(phi) * 16;
+                        const wx = Math.sin(phi) * 14, wy = -Math.cos(phi) * 14;
+                        const wlX = carX + rx - wx, wlY = carY + ry - wy;
+                        const wrX = carX + rx + wx, wrY = carY + ry + wy;
+
+                        smokeParticles.push({
+                            x: wlX, y: wlY, vx: -dx * 0.15 - turnRate * 3.5, vy: -dy * 0.15,
+                            radius: 3, maxRadius: 18, alpha: 0.75, decay: 0.015, color: { r: 240, g: 240, b: 240 }
+                        });
+                        smokeParticles.push({
+                            x: wrX, y: wrY, vx: -dx * 0.15 - turnRate * 3.5, vy: -dy * 0.15,
+                            radius: 3, maxRadius: 18, alpha: 0.75, decay: 0.015, color: { r: 240, g: 240, b: 240 }
+                        });
+                    }
+                }
+            }
+            lastCarX = carX;
+            lastCarY = carY;
+        }
+
+        let angleDiff = targetRotationAngle - currentAngle;
+        while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
+        while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
+        currentAngle += angleDiff * 0.15;
+
+        currentDrift += (targetDrift - currentDrift) * 0.12;
+        targetDrift *= 0.88;
+
+        currentTiltX += (targetTiltX - currentTiltX) * 0.12;
+        currentTiltY += (targetTiltY - currentTiltY) * 0.12;
+        targetTiltX *= 0.88;
+        targetTiltY *= 0.88;
+
+        car3D.position.y = 0.1 + Math.sin(Date.now() * 0.0035) * 0.04;
+        car3D.rotation.y = currentAngle + currentDrift;
+        car3D.rotation.z = currentTiltX + Math.cos(Date.now() * 0.002) * 0.025;
+        car3D.rotation.x = currentTiltY;
+
+        renderer.render(scene, camera);
+
+        if (smokeCtx && smokeCanvas) {
+            smokeCtx.clearRect(0, 0, smokeCanvas.width, smokeCanvas.height);
+            for (let i = smokeParticles.length - 1; i >= 0; i--) {
+                const p = smokeParticles[i];
+                p.x += p.vx; p.y += p.vy;
+                p.radius += (p.maxRadius - p.radius) * 0.06;
+                p.alpha -= p.decay;
+
+                if (p.alpha <= 0) {
+                    smokeParticles.splice(i, 1);
+                    continue;
+                }
+
+                const grad = smokeCtx.createRadialGradient(p.x, p.y, p.radius * 0.1, p.x, p.y, p.radius);
+                grad.addColorStop(0, 'rgba(' + p.color.r + ',' + p.color.g + ',' + p.color.b + ',' + p.alpha + ')');
+                grad.addColorStop(1, 'rgba(' + (p.color.r - 20) + ',' + (p.color.g - 20) + ',' + (p.color.b - 20) + ', 0)');
+
+                smokeCtx.beginPath();
+                smokeCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                smokeCtx.fillStyle = grad;
+                smokeCtx.fill();
+            }
+        }
+
+        animationId = requestAnimationFrame(render3DLoop);
+    }
+    
+    render3DLoop();
+
+    return () => {
+      cancelAnimationFrame(animationId);
+      window.removeEventListener('resize', resizeSmokeCanvas);
+      if (smokeCanvas && smokeCanvas.parentNode) {
+        smokeCanvas.parentNode.removeChild(smokeCanvas);
+      }
+      if (renderer) {
+        renderer.dispose();
+      }
+      if (canvasContainer && canvasContainer.parentNode) {
+        canvasContainer.parentNode.removeChild(canvasContainer);
+      }
+    };
+  }, []);
 
   return (
-    <>
-      {/* Smoke Shapes (Lavender & Beige Neon) */}
-      {particles.map((p) => (
-        <svg
-          key={p.id}
-          className="fixed pointer-events-none z-9997"
-          style={{
-            left: p.x,
-            top: p.y,
-            width: p.size,
-            height: p.size,
-            transform: `translate(-50%, -50%) rotate(${p.rotation}deg)`,
-            opacity: p.opacity,
-            filter: `drop-shadow(0 0 4px ${p.color})`,
-          }}
-          viewBox="0 0 24 24"
-        >
-          {p.shape === "circle" && (
-            <circle cx="12" cy="12" r="8" fill={p.color} />
-          )}
-          {p.shape === "square" && (
-            <rect x="4" y="4" width="16" height="16" fill={p.color} />
-          )}
-          {p.shape === "triangle" && (
-            <polygon points="12,3 3,21 21,21" fill={p.color} />
-          )}
-        </svg>
-      ))}
-
-      {/* Neon Beige Luxury Sports Car Cursor */}
-      <div
-        className="fixed pointer-events-none z-9999 hidden md:block"
-        style={{
-          left: position.x,
-          top: position.y,
-          width: 28,
-          height: 56,
-          transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
-          transformOrigin: "center",
-          transition: "transform 0.08s ease-out",
-          filter: "drop-shadow(0 0 6px rgba(255, 236, 161, 0.85))", // Neon beige glow
-        }}
-      >
-        <svg width="28" height="56" viewBox="0 0 28 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-          {/* Wheels */}
-          <rect x="1" y="10" width="3" height="8" rx="1.5" fill="#111" />
-          <rect x="24" y="10" width="3" height="8" rx="1.5" fill="#111" />
-          <rect x="1" y="38" width="3" height="8" rx="1.5" fill="#111" />
-          <rect x="24" y="38" width="3" height="8" rx="1.5" fill="#111" />
-          
-          {/* Neon Beige Car Body */}
-          <path d="M4,12 C4,6 8,2 14,2 C20,2 24,6 24,12 L24,42 C24,47 21,50 14,50 C7,50 4,47 4,42 Z" fill="#FFECA1" />
-          <path d="M5,13 C5,8 9,4 14,4 C19,4 23,8 23,13 L23,41 C23,45 20,48 14,48 C8,48 5,45 5,41 Z" fill="#FDF6E2" />
-          
-          {/* Cabin / Windshield (Lavender themed) */}
-          <path d="M7,20 C7,17 10,15 14,15 C18,15 21,17 21,20 L19,32 C19,34 17,35 14,35 C11,35 9,34 9,32 Z" fill="#1A0D2A" />
-          <path d="M9,19 C9,18 11,17 14,17 C17,17 19,18 19,19 L18,22 C18,23 16,24 14,24 C12,24 10,23 10,22 Z" fill="#D1B3FF" opacity="0.6" />
-          
-          {/* Spoiler */}
-          <rect x="2" y="46" width="24" height="3" rx="1" fill="#FFECA1" />
-          
-          {/* Exhaust Pipes */}
-          <circle cx="10" cy="51" r="1.2" fill="#BBBBBB" />
-          <circle cx="18" cy="51" r="1.2" fill="#BBBBBB" />
-        </svg>
-      </div>
-    </>
+    <div
+      ref={cursorRef}
+      className={`mil-ball fixed pointer-events-none z-[9999] transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'} hidden md:block`}
+      style={{
+        left: position.x,
+        top: position.y,
+        width: 1,
+        height: 1,
+        transform: "translate(-50%, -50%)",
+      }}
+    />
   );
 }

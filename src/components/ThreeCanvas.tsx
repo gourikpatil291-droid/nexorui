@@ -154,46 +154,15 @@ export default function ThreeCanvas() {
     antennaTip.position.set(-1.7 - 1.5*Math.sin(0.2), 1.0 + 1.5*Math.cos(0.2), 0);
     headGroup.add(antennaTip);
 
-    // Silver Laptop
-    const laptopGroup = new THREE.Group();
-    laptopGroup.position.set(0, -1.8, 3.2);
-    robotGroup.add(laptopGroup);
-
-    // Laptop Base (resting flat, silver)
-    const laptopBaseGeometry = new THREE.BoxGeometry(5.2, 0.18, 3.8);
-    const laptopBaseMesh = new THREE.Mesh(laptopBaseGeometry, silverMaterial);
-    laptopGroup.add(laptopBaseMesh);
-
-    // Laptop keyboard area (dark grey rectangle inset)
-    const keyboardGeometry = new THREE.BoxGeometry(4.4, 0.05, 2.0);
-    const keyboardMesh = new THREE.Mesh(keyboardGeometry, metalMaterial);
-    keyboardMesh.position.set(0, 0.1, 0.2);
-    laptopGroup.add(keyboardMesh);
-
-    // Laptop Lid (angled back)
-    const laptopLidGroup = new THREE.Group();
-    laptopLidGroup.position.set(0, 0.1, -1.8); // hinge position
-    laptopLidGroup.rotation.x = -1.1; // open screen angle
-    laptopGroup.add(laptopLidGroup);
-
-    const laptopLidGeometry = new THREE.BoxGeometry(5.2, 3.6, 0.16);
-    const laptopLidMesh = new THREE.Mesh(laptopLidGeometry, silverMaterial);
-    laptopLidMesh.position.y = 1.8;
-    laptopLidGroup.add(laptopLidMesh);
-
-    // Glowing screen face
-    const laptopScreenGeometry = new THREE.BoxGeometry(4.8, 3.2, 0.05);
-    const laptopScreenMesh = new THREE.Mesh(laptopScreenGeometry, screenGlowMaterial);
-    laptopScreenMesh.position.set(0, 1.8, 0.09); // slightly in front of lid
-    laptopLidGroup.add(laptopScreenMesh);
-
-    // Arms & Hands Setup
+    // Arms & Hands Setup (hanging naturally at sides)
     const leftArmGroup = new THREE.Group();
     leftArmGroup.position.set(-2.6, 1.2, 0);
+    leftArmGroup.rotation.z = 0.08;
     robotGroup.add(leftArmGroup);
 
     const rightArmGroup = new THREE.Group();
     rightArmGroup.position.set(2.6, 1.2, 0);
+    rightArmGroup.rotation.z = -0.08;
     robotGroup.add(rightArmGroup);
 
     // Large rounded shoulder plates (Maroon)
@@ -203,63 +172,56 @@ export default function ThreeCanvas() {
     const rightShoulder = new THREE.Mesh(shoulderGeometry, maroonMaterial);
     rightArmGroup.add(rightShoulder);
 
-    // Upper arms (Cream cylinder)
+    // Upper arms (Cream cylinder - hanging down)
     const upperArmGeometry = new THREE.CylinderGeometry(0.35, 0.35, 1.8, 8);
-    upperArmGeometry.rotateX(Math.PI / 4);
     const leftUpperArm = new THREE.Mesh(upperArmGeometry, creamMaterial);
-    leftUpperArm.position.set(-0.3, -0.7, 0.7);
+    leftUpperArm.position.set(0, -0.9, 0);
     leftArmGroup.add(leftUpperArm);
     
     const rightUpperArm = new THREE.Mesh(upperArmGeometry, creamMaterial);
-    rightUpperArm.position.set(0.3, -0.7, 0.7);
+    rightUpperArm.position.set(0, -0.9, 0);
     rightArmGroup.add(rightUpperArm);
 
     // Elbow joints (metal)
     const elbowGeometry = new THREE.SphereGeometry(0.4, 8, 8);
     const leftElbow = new THREE.Mesh(elbowGeometry, metalMaterial);
-    leftElbow.position.set(-0.6, -1.4, 1.4);
+    leftElbow.position.set(0, -1.8, 0);
     leftArmGroup.add(leftElbow);
 
     const rightElbow = new THREE.Mesh(elbowGeometry, metalMaterial);
-    rightElbow.position.set(0.6, -1.4, 1.4);
+    rightElbow.position.set(0, -1.8, 0);
     rightArmGroup.add(rightElbow);
 
-    // Forearms (Maroon cylinder)
+    // Forearms (Maroon cylinder - hanging down)
     const forearmGeometry = new THREE.CylinderGeometry(0.4, 0.35, 1.8, 8);
-    forearmGeometry.rotateX(Math.PI / 3);
     const leftForearm = new THREE.Mesh(forearmGeometry, maroonMaterial);
-    leftForearm.position.set(-0.3, -2.1, 2.3);
+    leftForearm.position.set(0, -2.7, 0);
     leftArmGroup.add(leftForearm);
 
     const rightForearm = new THREE.Mesh(forearmGeometry, maroonMaterial);
-    rightForearm.position.set(0.3, -2.1, 2.3);
+    rightForearm.position.set(0, -2.7, 0);
     rightArmGroup.add(rightForearm);
 
-    // Palms (metal)
-    const handGeometry = new THREE.BoxGeometry(0.8, 0.4, 0.9);
+    // Palms (metal - hanging down)
+    const handGeometry = new THREE.BoxGeometry(0.7, 0.4, 0.7);
     const leftHand = new THREE.Mesh(handGeometry, metalMaterial);
-    leftHand.position.set(0.2, -2.7, 3.2);
+    leftHand.position.set(0, -3.7, 0);
     leftArmGroup.add(leftHand);
 
     const rightHand = new THREE.Mesh(handGeometry, metalMaterial);
-    rightHand.position.set(-0.2, -2.7, 3.2);
+    rightHand.position.set(0, -3.7, 0);
     rightArmGroup.add(rightHand);
 
-    // Fingers typing (thin metal boxes)
-    const fingerGeometry = new THREE.BoxGeometry(0.15, 0.15, 0.6);
-    const leftFingers: THREE.Mesh[] = [];
-    const rightFingers: THREE.Mesh[] = [];
-
+    // Fingers resting down
+    const fingerGeometry = new THREE.BoxGeometry(0.12, 0.4, 0.12);
     for (let i = 0; i < 3; i++) {
       const lf = new THREE.Mesh(fingerGeometry, metalMaterial);
-      lf.position.set(-0.3 + i * 0.3, -0.2, 0.6); // relative to hand
+      lf.position.set(-0.2 + i * 0.2, -0.4, 0);
       leftHand.add(lf);
-      leftFingers.push(lf);
 
       const rf = new THREE.Mesh(fingerGeometry, metalMaterial);
-      rf.position.set(-0.3 + i * 0.3, -0.2, 0.6); // relative to hand
+      rf.position.set(-0.2 + i * 0.2, -0.4, 0);
       rightHand.add(rf);
-      rightFingers.push(rf);
     }
 
     // Lighting Setup
@@ -315,24 +277,9 @@ export default function ThreeCanvas() {
       headGroup.rotation.y = targetX * 0.65;
       headGroup.rotation.x = -targetY * 0.35;
 
-      // Animate Hands typing on the laptop
-      leftHand.position.y = -2.7 + Math.sin(elapsedTime * 28) * 0.08;
-      leftHand.position.z = 3.2 + Math.cos(elapsedTime * 22) * 0.05;
-      
-      rightHand.position.y = -2.7 + Math.cos(elapsedTime * 26) * 0.08;
-      rightHand.position.z = 3.2 + Math.sin(elapsedTime * 20) * 0.05;
-
-      // Slightly shift arm angles to match typing movement
-      leftArmGroup.rotation.z = Math.sin(elapsedTime * 28) * 0.02;
-      rightArmGroup.rotation.z = -Math.cos(elapsedTime * 26) * 0.02;
-
-      // Finger bending rotation animations using staggered sine waves
-      leftFingers.forEach((f, idx) => {
-        f.rotation.x = -Math.PI / 12 + Math.sin(elapsedTime * 35 + idx * 1.5) * 0.25;
-      });
-      rightFingers.forEach((f, idx) => {
-        f.rotation.x = -Math.PI / 12 + Math.cos(elapsedTime * 32 + idx * 1.5) * 0.25;
-      });
+      // Gentle floating/breathing animation for arms
+      leftArmGroup.rotation.z = 0.08 + Math.sin(elapsedTime * 1.5) * 0.015;
+      rightArmGroup.rotation.z = -0.08 - Math.sin(elapsedTime * 1.5) * 0.015;
 
       renderer.render(scene, camera);
       animationFrameId = requestAnimationFrame(animate);
@@ -378,10 +325,7 @@ export default function ThreeCanvas() {
       forearmGeometry.dispose();
       handGeometry.dispose();
       fingerGeometry.dispose();
-      laptopBaseGeometry.dispose();
-      keyboardGeometry.dispose();
-      laptopLidGeometry.dispose();
-      laptopScreenGeometry.dispose();
+      // Laptop geometries removed
       
       creamMaterial.dispose();
       maroonMaterial.dispose();

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { ArrowUp } from "lucide-react";
 
 export default function Footer() {
@@ -72,10 +73,11 @@ export default function Footer() {
               Navigation
             </h5>
             <div className="flex flex-col space-y-3">
-              <a href="#services" className="text-xs font-sans text-warm-beige/50 hover:text-warm-beige transition-colors duration-300 interactive-hover">Services</a>
-              <a href="#about" className="text-xs font-sans text-warm-beige/50 hover:text-warm-beige transition-colors duration-300 interactive-hover">About</a>
-              <a href="#process" className="text-xs font-sans text-warm-beige/50 hover:text-warm-beige transition-colors duration-300 interactive-hover">Process</a>
-              <a href="#portfolio" className="text-xs font-sans text-warm-beige/50 hover:text-warm-beige transition-colors duration-300 interactive-hover">Portfolio</a>
+              <Link href="/" className="text-xs font-sans text-warm-beige/50 hover:text-warm-beige transition-colors duration-300 interactive-hover">Home</Link>
+              <Link href="/services" className="text-xs font-sans text-warm-beige/50 hover:text-warm-beige transition-colors duration-300 interactive-hover">Services</Link>
+              <Link href="/portfolio" className="text-xs font-sans text-warm-beige/50 hover:text-warm-beige transition-colors duration-300 interactive-hover">Portfolio</Link>
+              <Link href="/team" className="text-xs font-sans text-warm-beige/50 hover:text-warm-beige transition-colors duration-300 interactive-hover">Team</Link>
+              <Link href="/contact" className="text-xs font-sans text-warm-beige/50 hover:text-warm-beige transition-colors duration-300 interactive-hover">Contact</Link>
             </div>
           </div>
 
@@ -107,7 +109,7 @@ export default function Footer() {
         {/* Footer Base */}
         <div className="pt-8 border-t border-warm-beige/5 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="text-[10px] font-sans text-warm-beige/35 text-center sm:text-left select-none">
-            &copy; {new Date().getFullYear()} NEXORESHA. All rights reserved. Designed for Futuristic SaaS.
+            © Copyright 2026 - Nexoresha Technologies. All Rights Reserved.
           </div>
 
           {/* Scroll to Top Arrow Button */}

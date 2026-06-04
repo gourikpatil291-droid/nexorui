@@ -1,17 +1,36 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
+import { usePathname } from "next/navigation";
 
 export default function Preloader() {
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const timeoutRef = useRef<any>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
+    setMounted(true);
+    
+    // Only show preloader on the home page.
+    if (pathname !== "/") {
+      setVisible(false);
+      if (typeof window !== "undefined") {
+        (window as any).preloaderFinished = true;
+        window.dispatchEvent(new Event("preloader-done"));
+      }
+      return;
+    }
+
+    // By not using sessionStorage, the preloader will naturally play on 
+    // full page refresh or initial load, but won't replay on client-side routing.
+    setVisible(true);
+    
     // Disable scroll while loading
     document.body.style.overflow = "hidden";
 
-    // Initial load backup timeout (12 seconds) - if video doesn't start playing at all
+    // Initial load backup timeout (12 seconds)
     timeoutRef.current = setTimeout(() => {
       handleComplete();
     }, 12000);
@@ -20,40 +39,36 @@ export default function Preloader() {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       document.body.style.overflow = "unset";
     };
-  }, []);
+  }, [pathname]);
 
   const handlePlay = () => {
-    // Clear initial load timeout
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
     
-    // Set a new backup timeout based on the actual duration of the video + 4 seconds buffer
     const duration = videoRef.current?.duration || 7;
     timeoutRef.current = setTimeout(() => {
       handleComplete();
-    }, (duration * 1000) + 4000);
+    }, (duration * 1000) + 2000);
   };
 
   const handleComplete = () => {
     setVisible(false);
     document.body.style.overflow = "unset";
     
-    // Dispatch custom event to notify other components (e.g. HeroSection)
     if (typeof window !== "undefined") {
       (window as any).preloaderFinished = true;
       window.dispatchEvent(new Event("preloader-done"));
     }
   };
 
-  if (!visible) return null;
+  if (!mounted || !visible) return null;
 
   return (
-    <div className="fixed inset-0 z-9999 flex flex-col items-center justify-center bg-black">
-      {/* Fullscreen Video Preloader - no overlay glows, no opacity changes, no animations */}
+    <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black">
       <video
         ref={videoRef}
-        src="/use_video.mp4"
+        src="/preuse.mp4"
         autoPlay
         muted
         playsInline
