@@ -207,10 +207,12 @@ export default function AboutSection() {
     container.addEventListener("mousedown", handleClick);
 
     // Animation loop
-    const clock = new THREE.Clock();
+    const clock = new THREE.Timer();
+    clock.connect(document);
     let animationFrameId: number;
 
     const animate = () => {
+      clock.update();
       const delta = clock.getDelta();
       
       // Game State Machine
@@ -257,7 +259,7 @@ export default function AboutSection() {
       }
 
       // Gentle floating animation of the entire board for visual flair
-      const elapsed = clock.getElapsedTime();
+      const elapsed = clock.getElapsed();
       gameGroup.position.y = Math.sin(elapsed * 1.5) * 0.1;
       gameGroup.rotation.y = Math.sin(elapsed * 0.5) * 0.05;
 

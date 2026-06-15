@@ -123,13 +123,14 @@ export default function TestimonialsSection() {
               <div 
                 key={index}
                 onClick={() => setActiveIndex(index)}
-                className={`relative rounded-full transition-all duration-700 ease-in-out cursor-pointer flex-shrink-0 bg-warm-beige ${classes}`}
+                className={`relative rounded-full aspect-square min-h-[32px] transition-all duration-700 ease-in-out cursor-pointer flex-shrink-0 bg-warm-beige ${classes}`}
               >
                 <Image
                   src={test.image}
                   alt={test.name}
                   fill
                   className="object-contain p-3 md:p-5 rounded-full"
+                  sizes="(max-width: 768px) 4rem, 5rem"
                 />
               </div>
             );

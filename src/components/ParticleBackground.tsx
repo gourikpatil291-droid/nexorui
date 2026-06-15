@@ -3,7 +3,13 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
-export default function ParticleBackground() {
+export default function ParticleBackground({ 
+  colorRGB = "123, 24, 34",
+  fogHex = 0x0A0203 
+}: { 
+  colorRGB?: string;
+  fogHex?: number;
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -18,7 +24,7 @@ export default function ParticleBackground() {
 
     // Setup Scene
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x0A0203, 0.015);
+    scene.fog = new THREE.FogExp2(fogHex, 0.015);
 
     // Setup Camera
     const camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 100);
@@ -64,9 +70,9 @@ export default function ParticleBackground() {
       const ctx = canvasEl.getContext("2d");
       if (ctx) {
         const gradient = ctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
-        gradient.addColorStop(0, "rgba(123, 24, 34, 1)");
-        gradient.addColorStop(0.3, "rgba(123, 24, 34, 0.8)");
-        gradient.addColorStop(1, "rgba(123, 24, 34, 0)");
+        gradient.addColorStop(0, `rgba(${colorRGB}, 1)`);
+        gradient.addColorStop(0.3, `rgba(${colorRGB}, 0.8)`);
+        gradient.addColorStop(1, `rgba(${colorRGB}, 0)`);
         ctx.fillStyle = gradient;
         ctx.beginPath();
         ctx.arc(size/2, size/2, size/2, 0, Math.PI * 2);
@@ -101,11 +107,13 @@ export default function ParticleBackground() {
     window.addEventListener("mousemove", handleMouseMove);
 
     // Animation Loop
-    const clock = new THREE.Clock();
+    const clock = new THREE.Timer();
+    clock.connect(document);
     let animationFrameId: number;
 
     const animate = () => {
-      const elapsedTime = clock.getElapsedTime();
+      clock.update();
+      const elapsedTime = clock.getElapsed();
 
       targetX += (mouseX - targetX) * 0.05;
       targetY += (mouseY - targetY) * 0.05;

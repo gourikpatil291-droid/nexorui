@@ -53,12 +53,37 @@ export default function HeroSection() {
 
   // Preload images
   useEffect(() => {
-    for (let i = 1; i <= frameCount; i++) {
+    // Load first 20 frames immediately for quick initial interaction
+    for (let i = 1; i <= Math.min(20, frameCount); i++) {
       const img = new window.Image();
       const frameStr = i.toString().padStart(3, '0');
       img.src = `/hero-frames/ezgif-frame-${frameStr}.jpg`;
       imagesRef.current[i] = img;
     }
+
+    // Lazy load the rest in small batches to prevent locking the main thread
+    let currentBatch = 21;
+    const batchSize = 10;
+
+    const loadNextBatch = () => {
+      if (currentBatch > frameCount) return;
+
+      for (let i = currentBatch; i < currentBatch + batchSize && i <= frameCount; i++) {
+        const img = new window.Image();
+        const frameStr = i.toString().padStart(3, '0');
+        img.src = `/hero-frames/ezgif-frame-${frameStr}.jpg`;
+        imagesRef.current[i] = img;
+      }
+
+      currentBatch += batchSize;
+      // Yield to main thread heavily so preloader & scroll stay 60fps
+      setTimeout(loadNextBatch, 100); 
+    };
+
+    // Start lazy loading slightly after initial render to let preloader finish
+    const timeoutId = setTimeout(loadNextBatch, 800);
+
+    return () => clearTimeout(timeoutId);
   }, []);
 
   const drawFrame = (index: number) => {

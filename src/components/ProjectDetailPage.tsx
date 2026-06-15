@@ -143,6 +143,7 @@ export default function ProjectDetailPage({
               alt={title}
               fill
               className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 100vw"
               priority
             />
             <div className="absolute inset-0 bg-gradient-to-t from-maroon-black via-transparent to-transparent opacity-85" />
@@ -235,6 +236,7 @@ export default function ProjectDetailPage({
                       alt={`Gallery view ${idx + 1}`}
                       fill
                       className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-103"
+                      sizes="(max-width: 768px) 100vw, 50vw"
                     />
                     <div className="absolute inset-0 bg-maroon-black/10 group-hover:bg-transparent transition-all duration-350" />
                   </motion.div>
